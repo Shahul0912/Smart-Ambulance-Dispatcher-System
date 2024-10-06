@@ -1,0 +1,68 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100%;
+}
+.container {
+    display: flex;
+    height: 100%;
+}
+.sidebar {
+    flex: 1;
+    padding: 20px;
+    max-width: 500px;
+    overflow-y: auto;
+    background-image: url(—Pngtree—minimal\ ambulance\ emergency\ medical\ background_965051.jpg);
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+.sidebar-content {
+    
+    padding: 20px;
+    border-radius: 10px;
+}
+#map {
+    flex: 2;
+    height: 100%;
+}
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.logo img {
+    width: 300px;
+    height: auto;
+}
+h1, h2 {
+    color: #e74c3c;
+}
+input, button, textarea {
+    margin: 10px 0;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #c0392b;
+}
+#status {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #c0392b;
+}
+.section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #c92424;
+}
+.section p {
+    color: rgb(0, 0, 0); /* Changed color to red */
+}
