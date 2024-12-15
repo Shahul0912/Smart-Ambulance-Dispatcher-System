@@ -1,3 +1,4 @@
 .env
-_pycache_/
-firebase_creds.js
+__pycache__/
+firebase_creds.json
+f.html
