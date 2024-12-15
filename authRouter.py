@@ -48,3 +48,15 @@ def login(form: loginForm):
         return {"success": "Login successful", "user_id": user_id}
     else:
         return {"error": "Invalid username/password"}
+
+@authRouter.post('/getUserDetails')
+def get_user_details(id:str):
+    collection = db.collection('users')
+    query = collection.where("id", "==",id)
+    docs = query.stream()
+    user=None
+    for doc in docs:
+        user = doc.to_dict()  # Get user data
+        return user
+    return {'error':'no user found for the user id'}
+
