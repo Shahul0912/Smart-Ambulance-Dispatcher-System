@@ -13,7 +13,7 @@ body, html {
     padding: 20px;
     max-width: 500px;
     overflow-y: auto;
-    background-image: url(—Pngtree—minimal\ ambulance\ emergency\ medical\ background_965051.jpg);
+    background-image: url(/static/background.jpg);
     background-size: cover;
     background-position: center;
     color: white;
@@ -65,4 +65,14 @@ button:hover {
 }
 .section p {
     color: rgb(0, 0, 0); /* Changed color to red */
+}
+
+.locate-me-button{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background-color: white;
+    margin-right: 10px;
+
+
 }

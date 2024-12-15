@@ -5,22 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AmbuFind - Emergency Ambulance Booking</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places,geometry"></script>
+    <script  src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places,geometry" async></script>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+<body>
 <body>
     <div class="container">
         <div class="sidebar">
             <div class="sidebar-content">
                 <div class="logo">
-                    <img src="WhatsApp Image 2024-10-05 at 5.12.30 PM.png" alt="AmbuFind Logo">
+                    <img src="/static/logo.png" alt="AmbuFind Logo">
                 </div>
                 
                 <form id="ambulance-form">
                     <input type="text" id="name" placeholder="Your Name" required>
                     <input type="tel" id="phone" placeholder="Phone Number" required>
                     <input type="text" id="location" placeholder="Your Location" required>
-                    <button type="button">Find Ambulance</button>
+                    <button type="button" id="find-ambulance-btn">Find Ambulance</button>
                 </form>
                 <div id="status">Locating you...</div>
 
@@ -35,5 +36,6 @@
         <div id="map"></div>
     </div>
     <script src="/static/script.js"></script>
+    <script src="/static/tracking.js"></script>
 </body>
 </html>
