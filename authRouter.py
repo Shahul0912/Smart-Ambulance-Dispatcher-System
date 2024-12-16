@@ -52,14 +52,15 @@ def login(form: loginForm):
 
 class getUserSchema(BaseModel):
     id:str
+    
 @authRouter.post('/getUserDetails')
 def get_user_details(req:getUserSchema):
-    collection = db.collection('users')
-    query = collection.where("id", "==",req.id)
-    docs = query.stream()
-    user=None
-    for doc in docs:
-        user = doc.to_dict()  # Get user data
+    doc_ref = db.collection('users').document(req.id)
+    doc = doc_ref.get()
+
+    if doc.exists:
+        user = doc.to_dict()  # Fetch user data
         return user
-    return {'error':'no user found for the user id'}
+    else:
+        return {'error': 'No user found for the provided user ID'}
 
