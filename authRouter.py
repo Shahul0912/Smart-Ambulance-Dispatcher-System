@@ -49,10 +49,13 @@ def login(form: loginForm):
     else:
         return {"error": "Invalid username/password"}
 
+
+class getUserSchema(BaseModel):
+    id:str
 @authRouter.post('/getUserDetails')
-def get_user_details(id:str):
+def get_user_details(req:getUserSchema):
     collection = db.collection('users')
-    query = collection.where("id", "==",id)
+    query = collection.where("id", "==",req.id)
     docs = query.stream()
     user=None
     for doc in docs:
