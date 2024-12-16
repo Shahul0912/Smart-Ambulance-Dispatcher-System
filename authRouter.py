@@ -28,14 +28,10 @@ def register(details:registrationForm):
     return response
     
 
-class loginForm(BaseModel):
-    username:str
-    password:str
-
 @authRouter.post('/login')
-def login(form: loginForm):
+def login(username:str,password:str):
     collection = db.collection('users')
-    query = collection.where("username", "==", form.username).where('password', '==', form.password)
+    query = collection.where("username", "==", username).where('password', '==', password)
     docs = query.stream()
 
     user = None
