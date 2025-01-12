@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from fastapi.templating import Jinja2Templates
 from db import db
 from authRouter import authRouter
+from datetime import datetime   
 
 load_dotenv()
 
@@ -103,7 +104,9 @@ def update_ambulance_position(req:updatePositionSchema):
     longitude=req.longitude
     
     
+    
     try:
+        removeInactiveAmbulances()
         collection = db.collection('ambulances')
         
         # Query to find documents with the specified user_id
@@ -116,6 +119,7 @@ def update_ambulance_position(req:updatePositionSchema):
         for doc in docs:
             # Update the position and lastUpdated field of each ambulance that matches the user_id
             doc.reference.update({
+                'active':True,
                 'latitude': latitude,
                 'longitude': longitude,
                 'lastUpdated': firestore.SERVER_TIMESTAMP  # Automatically sets current server time
@@ -136,12 +140,14 @@ def update_ambulance_position(req:updatePositionSchema):
         else:
             # If no documents are found, create a new document with the provided data and lastUpdated
             new_doc_ref = collection.add({
+                'active':True,
                 'user_id': user_id,
                 'latitude': latitude,
                 'longitude': longitude,
                 'patient_latitude': None,
                 'patient_longitude': None,
                 'lastUpdated': firestore.SERVER_TIMESTAMP  # Automatically sets current server time
+                
             })
             return {
                 'success': 'No matching ambulances found. A new ambulance document was created.',
@@ -151,6 +157,24 @@ def update_ambulance_position(req:updatePositionSchema):
     except Exception as e:
         return {'error': f'An error occurred: {str(e)}'}
 
+    
+def removeInactiveAmbulances():
+    collection = db.collection('ambulances')
+
+    # Get the current time
+    now = datetime.datetime.utcnow()
+
+    # Calculate the time 5 minutes ago
+    five_minutes_ago = now - datetime.timedelta(minutes=5)
+
+    # Convert to Firestore timestamp format
+    five_minutes_ago_timestamp = firestore.Timestamp.from_datetime(five_minutes_ago)
+
+    # Query to find documents where lastUpdated is older than 5 minutes
+    query = collection.where('lastUpdated', '<', five_minutes_ago_timestamp)
+
+    # Execute the query
+    docs = query.stream()
     
 
 # Serve the HTML file at root
