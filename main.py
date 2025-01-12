@@ -78,9 +78,10 @@ async def find_ambulance(latitude: float, longitude: float):
     for doc in docs:
         ambulances.append({**doc.to_dict(), "doc_id": doc.id})  # Include doc_id for updating later
 
+    print(ambulances)
     # Calculate distances and store them with the ambulance data
     for ambulance in ambulances:
-        distance = haversine(longitude, latitude, ambulance["longitude"], ambulance["latitude"])
+        distance = haversine(longitude, latitude, float(ambulance["longitude"]), float(ambulance["latitude"]))
         nearby_ambulances.append({**ambulance, "distance": distance})
 
     # Sort ambulances by distance and get the closest one
