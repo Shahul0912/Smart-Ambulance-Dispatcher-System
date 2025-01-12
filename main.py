@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException,Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from firebase_admin import firestore
 from pydantic import BaseModel
 from typing import List
 from uuid import UUID, uuid4
@@ -46,7 +47,7 @@ def haversine(lon1, lat1, lon2, lat2):
 async def find_ambulance(latitude: float, longitude: float):
     nearby_ambulances = []
     collection=db.collection('ambulances')
-    query=collection.where('active','==',True)
+    query=collection.where('active','==',True).where('patient_latitude','==',None)
 
     docs=query.stream()
     ambulances = []
@@ -80,15 +81,67 @@ def track_ambulance(ambulance_id: str):
     else:
         return {'error':'Ambulance not found'}
     
-@app.post("/updateAmbulancePosition/{ambulance_id}")
-def update_ambulance_position(ambulance_id:str,latitude:float,longitude:float):
-    collection=db.collection('ambulances')
-    doc=collection.document(ambulance_id)
-    if doc.exists:
-        doc.update({'latitude':latitude,'longitude':longitude})
-        return {'success':'successfully updated the position '}
-    else:
-        return {'error':'no ambulance found for the id'}
+
+# def update_ambulance_position(user_id:str,latitude:float,longitude:float):
+#     collection=db.collection('ambulances')
+#     doc=collection.document(ambulance_id)
+#     if doc.exists:
+#         doc.update({'latitude':latitude,'longitude':longitude})
+#         return {'success':'successfully updated the position '}
+#     else:
+#         return {'error':'no ambulance found for the id'}
+
+@app.post("/updateAmbulancePosition")
+def update_ambulance_position(user_id: str, latitude: float, longitude: float):
+    
+    try:
+        collection = db.collection('ambulances')
+        
+        # Query to find documents with the specified user_id
+        docs = collection.where('user_id', '==', user_id).stream()
+
+        updated_count = 0
+        patient_latitude = None
+        patient_longitude = None
+
+        for doc in docs:
+            # Update the position and lastUpdated field of each ambulance that matches the user_id
+            doc.reference.update({
+                'latitude': latitude,
+                'longitude': longitude,
+                'lastUpdated': firestore.SERVER_TIMESTAMP  # Automatically sets current server time
+            })
+            # Get patient_latitude and patient_longitude from the document (or keep as None)
+            patient_latitude = doc.to_dict().get('patient_latitude', None)
+            patient_longitude = doc.to_dict().get('patient_longitude', None)
+            updated_count += 1
+
+        if updated_count > 0:
+            response= {
+                'success': f'Successfully updated the position of {updated_count} ambulances.',
+                }
+            if patient_latitude and patient_longitude:
+                response['targetLatitude']=patient_latitude,
+                response['targetLongitude']=patient_longitude
+            return response
+        else:
+            # If no documents are found, create a new document with the provided data and lastUpdated
+            new_doc_ref = collection.add({
+                'user_id': user_id,
+                'latitude': latitude,
+                'longitude': longitude,
+                'patient_latitude': None,
+                'patient_longitude': None,
+                'lastUpdated': firestore.SERVER_TIMESTAMP  # Automatically sets current server time
+            })
+            return {
+                'success': 'No matching ambulances found. A new ambulance document was created.',
+               
+            }
+
+    except Exception as e:
+        return {'error': f'An error occurred: {str(e)}'}
+
     
 
 # Serve the HTML file at root
