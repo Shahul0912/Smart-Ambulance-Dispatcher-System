@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from fastapi.templating import Jinja2Templates
 from db import db
 from authRouter import authRouter
-from datetime import datetime   
+import datetime 
 
 load_dotenv()
 
@@ -44,28 +44,65 @@ def haversine(lon1, lat1, lon2, lat2):
     c = 2 * asin(sqrt(a)) 
     return 6371 * c  # Radius of Earth in kilometers
 
+# @app.get("/findAmbulance")
+# async def find_ambulance(latitude: float, longitude: float):
+#     nearby_ambulances = []
+#     collection=db.collection('ambulances')
+#     query=collection.where('active','==',True).where('allocated','==',False)
+
+#     docs=query.stream()
+#     ambulances = []
+#     for doc in docs:
+#         ambulances.append(doc.to_dict())    
+
+#     # Calculate distances and store them with the ambulance data
+#     for ambulance in ambulances:
+#         distance = haversine(longitude, latitude, ambulance["longitude"], ambulance["latitude"])
+#         nearby_ambulances.append({**ambulance, "distance": distance})
+
+#     # Sort ambulances by distance and get the closest 10
+#     nearby_ambulances = sorted(nearby_ambulances, key=lambda x: x["distance"])
+#     if len(nearby_ambulances)==0:
+#         return {"error":"Couldn't find Ambulances"}
+#     # Return the ambulances without the distance info
+#     return nearby_ambulances[0]
+
 @app.get("/findAmbulance")
 async def find_ambulance(latitude: float, longitude: float):
     nearby_ambulances = []
-    collection=db.collection('ambulances')
-    query=collection.where('active','==',True).where('patient_latitude','==',None)
+    collection = db.collection('ambulances')
+    query = collection.where('active', '==', True).where('patient_latitude','==',None)
 
-    docs=query.stream()
+    docs = query.stream()
     ambulances = []
     for doc in docs:
-        ambulances.append(doc.to_dict())    
+        ambulances.append({**doc.to_dict(), "doc_id": doc.id})  # Include doc_id for updating later
 
     # Calculate distances and store them with the ambulance data
     for ambulance in ambulances:
         distance = haversine(longitude, latitude, ambulance["longitude"], ambulance["latitude"])
         nearby_ambulances.append({**ambulance, "distance": distance})
 
-    # Sort ambulances by distance and get the closest 10
+    # Sort ambulances by distance and get the closest one
     nearby_ambulances = sorted(nearby_ambulances, key=lambda x: x["distance"])
-    if len(nearby_ambulances)==0:
-        return {"error":"Couldn't find Ambulances"}
-    # Return the ambulances without the distance info
-    return nearby_ambulances[0]
+    if len(nearby_ambulances) == 0:
+        return {"error": "Couldn't find ambulances"}
+
+    # Get the closest ambulance
+    closest_ambulance = nearby_ambulances[0]
+
+    # Update the closest ambulance's document with target location
+    collection.document(closest_ambulance["doc_id"]).update({
+        "patient_longitude": longitude,
+        "patient_latitude": latitude
+    })
+
+    # Return the closest ambulance data without the distance info
+    response = {key: value for key, value in closest_ambulance.items() if key != "distance"}
+    return response
+
+
+
 
 @app.get("/trackAmbulance/{ambulance_id}")
 def track_ambulance(ambulance_id: str):
@@ -175,7 +212,11 @@ def removeInactiveAmbulances():
 
     # Execute the query
     docs = query.stream()
-    
+    for doc in docs:
+        doc.reference.update({
+            'active': False  # Set 'active' to False
+        })
+        
 
 # Serve the HTML file at root
 @app.get("/", response_class=HTMLResponse)
