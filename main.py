@@ -92,7 +92,8 @@ def track_ambulance(ambulance_id: str):
 #         return {'error':'no ambulance found for the id'}
 
 @app.post("/updateAmbulancePosition")
-def update_ambulance_position(user_id: str, latitude: float, longitude: float):
+def update_ambulance_position(user_id: str, latitude: any, longitude: any):
+    
     
     try:
         collection = db.collection('ambulances')
