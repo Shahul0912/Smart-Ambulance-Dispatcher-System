@@ -100,6 +100,8 @@ async def find_ambulance(latitude: float, longitude: float):
 
     # Return the closest ambulance data without the distance info
     response = {key: value for key, value in closest_ambulance.items() if key != "distance"}
+    # import json 
+    # print(json.dumps({**response,'lastUpdated':''}))
     return response
 
 
@@ -172,7 +174,7 @@ def update_ambulance_position(req:updatePositionSchema):
                 'success': f'Successfully updated the position of {updated_count} ambulances.',
                 }
             if patient_latitude and patient_longitude:
-                response['targetLatitude']=patient_latitude,
+                response['targetLatitude']=patient_latitude
                 response['targetLongitude']=patient_longitude
             return response
         else:
