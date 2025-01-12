@@ -196,6 +196,7 @@ def update_ambulance_position(req:updatePositionSchema):
 
     
 def removeInactiveAmbulances():
+   
     collection = db.collection('ambulances')
 
     # Get the current time
@@ -204,11 +205,9 @@ def removeInactiveAmbulances():
     # Calculate the time 5 minutes ago
     five_minutes_ago = now - datetime.timedelta(minutes=5)
 
-    # Convert to Firestore timestamp format
-    five_minutes_ago_timestamp = firestore.Timestamp.from_datetime(five_minutes_ago)
-
     # Query to find documents where lastUpdated is older than 5 minutes
-    query = collection.where('lastUpdated', '<', five_minutes_ago_timestamp)
+    query = collection.where('lastUpdated', '<', five_minutes_ago)
+
 
     # Execute the query
     docs = query.stream()
