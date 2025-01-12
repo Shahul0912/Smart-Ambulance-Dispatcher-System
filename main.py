@@ -5,7 +5,7 @@ from firebase_admin import firestore
 from pydantic import BaseModel
 from typing import List
 from uuid import UUID, uuid4
-from typing import List
+from typing import List,Any
 from math import radians, cos, sin, asin, sqrt
 import os
 from dotenv import load_dotenv
@@ -92,7 +92,7 @@ def track_ambulance(ambulance_id: str):
 #         return {'error':'no ambulance found for the id'}
 
 @app.post("/updateAmbulancePosition")
-def update_ambulance_position(user_id: str, latitude: any, longitude: any):
+def update_ambulance_position(user_id: str, latitude:Any, longitude: Any):
     
     
     try:
