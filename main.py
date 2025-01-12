@@ -91,9 +91,16 @@ def track_ambulance(ambulance_id: str):
 #     else:
 #         return {'error':'no ambulance found for the id'}
 
+class updatePositionSchema(BaseModel):
+    user_id:Any
+    latitude:Any
+    longitude:Any
+
 @app.post("/updateAmbulancePosition")
-def update_ambulance_position(user_id: Any, latitude:Any, longitude: Any):
-    print(user_id ,latitude,longitude)
+def update_ambulance_position(req:updatePositionSchema):
+    user_id=req.user_id
+    latitude=req.latitude
+    longitude=req.longitude
     
     
     try:
