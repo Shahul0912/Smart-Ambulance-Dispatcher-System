@@ -92,7 +92,8 @@ def track_ambulance(ambulance_id: str):
 #         return {'error':'no ambulance found for the id'}
 
 @app.post("/updateAmbulancePosition")
-def update_ambulance_position(user_id: str, latitude:Any, longitude: Any):
+def update_ambulance_position(user_id: Any, latitude:Any, longitude: Any):
+    print(user_id ,latitude,longitude)
     
     
     try:
