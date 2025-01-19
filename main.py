@@ -110,15 +110,30 @@ async def find_ambulance(latitude: float, longitude: float):
 @app.get("/trackAmbulance/{ambulance_id}")
 def track_ambulance(ambulance_id: str):
     collection=db.collection('ambulances')
-    query=collection.where("id","==",ambulance_id)
-
-    docs=query.stream()
-    ambulances = []
-    for doc in docs:
-        ambulances.append(doc.to_dict()) 
+    docRef=collection.document(ambulance_id)
     
-    if len(ambulances)>0:
-        return ambulances[0]
+    doc=docRef.get()
+    if doc.exists:
+        return doc.to_dict()
+        
+    # return {'test':22}
+
+    # docs=query.stream()
+    # ambulance=None
+    # print(list(docs))
+    # # doc=collection.document(ambulance_id)
+    # # doc_ref=doc.get()
+    # for doc in docs:
+    #     ambulance=doc
+    #     break
+    # print(ambulance)
+    
+    
+        
+    # if ambulance != None:
+    #     return {'longitude':ambulance.longitude,'latitude':ambulance.latitude}
+       
+      
     else:
         return {'error':'Ambulance not found'}
     
