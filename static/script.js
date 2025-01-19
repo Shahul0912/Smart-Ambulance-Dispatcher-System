@@ -148,7 +148,7 @@ let riderMarker;
             if (data.error) {
                 return { error_message: data.error, ambulance_id: null }; // Return the error and no ambulance id
             } else {
-                return { error_message: null, ambulance_id:data.doc_id }; // Return ambulance id and no error
+                return { error_message: null, ambulance_id: await data.doc_id }; // Return ambulance id and no error
             }
         } catch (error) {
             console.error('Error fetching ambulances:', error);
